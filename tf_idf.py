@@ -13,10 +13,12 @@ y_train = raw_data[:, 1000];
 transformer = TfidfTransformer()
 tfidf = transformer.fit_transform(x_train)
 
+# print out the normalized data to file 
 np.savetxt('tf_idf.txt', 
 	       tfidf.toarray(), 
 	       delimiter='|', 
 	       header="tf-idf weighting of 'training_data.txt'")
+
 # TfidfTransformer(norm=...'l2', smooth_idf=True, sublinear_tf=False,
 #                  use_idf=True)
 

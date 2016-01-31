@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 # for exhaustive parameter search
 # from sklearn.grid_search import GridSearchCV  
 
-from sklearn.grid_search import RandomizedSearchCV
+from sklearn.grid_search import RandomizedSearchCV   
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn import cross_validation
@@ -45,19 +45,22 @@ print "Initializing BDT..."
 bdt = AdaBoostClassifier(DecisionTreeClassifier(max_depth=2))
 
 print "Training BDT and optimizing parameter space with random search..."
-param_dist = {"max_depth": sp_randint(2,5),
-		      "n_estimators": sp_randint(200,600)}
-n_iter_search = 2    # 20 is the number choosen in the example in sklearn 
+# it doesn't seem like you can select parameters inside the internal estimator
+# i.e. max_depth inside the decision tree won't work (it only optimizes the parameters 
+# on the level of random search)
+param_dist = {"n_estimators": sp_randint(200,600)}
+n_iter_search = 2    # 20 is the number choosen in the example in sklearn
 random_search = RandomizedSearchCV(bdt, param_distributions=param_dist,
                                    n_iter=n_iter_search)
 random_search.fit(x_train, y_train)
 
-print "Get params:"
-print random_search.get_params()
-print "Best estimator:"
-print random_search.best_estimator_
-print "Best params:"
-print random_search.best_params_
+# sanity checks that the parameters inside random_search were changed 
+# print "Get params:"
+# print random_search.get_params()
+# print "Best estimator:"
+# print random_search.best_estimator_
+# print "Best params:"
+# print random_search.best_params_
 
 # score the classfier on the test set 
 print "Scoring..."
