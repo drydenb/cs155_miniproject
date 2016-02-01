@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import random
 
 # for exhaustive parameter search
 # from sklearn.grid_search import GridSearchCV  
@@ -16,16 +17,18 @@ print "Loading training data..."
 raw_data = np.loadtxt('training_data.txt', delimiter='|', skiprows=1)
 x = raw_data[:, :1000];
 y = raw_data[:, 1000];
+
 # partition the data into training and testing sets 
 # (this is not done before submission as we train on the whole dataset)
-# test_size_percentage = 0.20    # size of test set as a percentage in [0., 1.]
-# seed = 0                       # pseudo-random seed for split 
-# x_train, x_test, y_train, y_test = cross_validation.train_test_split(
-# 	x, y, test_size=test_size_percentage, random_state=seed)
+test_size_percentage = 0.20            # size of test set as a percentage in [0., 1.]
+seed = random.randint(0, 2**30)        # pseudo-random seed for split 
+x_train, x_test, y_train, y_test = cross_validation.train_test_split(
+	x, y, test_size=test_size_percentage, random_state=seed)
 
 # for submission purposes only
-x_train = x
-y_train = y 
+# x_train = x
+# y_train = y 
+
 print "Loading test data..."
 test_data = np.loadtxt('testing_data.txt', delimiter='|', skiprows=1)
 
@@ -42,10 +45,11 @@ test_data = np.loadtxt('testing_data.txt', delimiter='|', skiprows=1)
 
 # initialize the adaboost classifier (defaults to using shallow decision trees
 # as the weak learner to boost) and optimize parameters using random search
-print "Initializing BDT..."
+print "Training adaboost DT..."
 bdt = AdaBoostClassifier(DecisionTreeClassifier(max_depth=2), n_estimators=100)
+bdt.fit(x_train, y_train)
 
-print "Training and bagging BDT..."
+print "Training bagged DT..."
 # it doesn't seem like you can select parameters inside the internal estimator
 # i.e. max_depth inside the decision tree won't work (it only optimizes the parameters 
 # on the level of random search)
@@ -55,16 +59,17 @@ print "Training and bagging BDT..."
 #                                    n_iter=n_iter_search)
 
 # Set up bagging around each AdaBoost set
-bagged_search = BaggingClassifier(bdt, n_estimators=101, max_samples=0.2)
-bagged_search.fit(x_train, y_train)
+bagged = BaggingClassifier(n_estimators=101, max_samples=0.15)
+bagged.fit(x_train, y_train)
 
 
 # score the classfier on the test set 
 # print "Scoring..."
-# print bagged_search.score(x_test, y_test)
+print bdt.score(x_test, y_test)
+print bagged.score(x_test, y_test)
 
 print "Writing predictions..."
-predictions = bagged_search.predict(test_data)
+predictions = bagged.predict(test_data)
 f = open('predictions.csv', 'w')
 f.write('Id,Prediction\n')
 for i in range(1355):
