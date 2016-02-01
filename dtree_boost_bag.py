@@ -8,6 +8,7 @@ import random
 # from sklearn.grid_search import RandomizedSearchCV   
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.ensemble import BaggingClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn import cross_validation
 from scipy.stats import randint as sp_randint
@@ -46,7 +47,7 @@ test_data = np.loadtxt('testing_data.txt', delimiter='|', skiprows=1)
 # initialize the adaboost classifier (defaults to using shallow decision trees
 # as the weak learner to boost) and optimize parameters using random search
 print "Training adaboost DT..."
-bdt = AdaBoostClassifier(DecisionTreeClassifier(max_depth=2), n_estimators=100)
+bdt = AdaBoostClassifier(DecisionTreeClassifier(max_depth=1), n_estimators=400)
 bdt.fit(x_train, y_train)
 
 print "Training bagged DT..."
@@ -59,17 +60,40 @@ print "Training bagged DT..."
 #                                    n_iter=n_iter_search)
 
 # Set up bagging around each AdaBoost set
-bagged = BaggingClassifier(n_estimators=101, max_samples=0.15)
+bagged = BaggingClassifier(n_estimators=201, max_samples=0.1)
 bagged.fit(x_train, y_train)
 
 
+# initialize a random forest classifier 
+print 'Training random forest...'
+rfc = RandomForestClassifier(n_estimators=200,
+							 max_features=40,
+							 min_samples_split=2,
+							 min_samples_leaf=1)
+rfc.fit(x_train, y_train)
+
+
+print "Training scores..."
+print bdt.score(x_train, y_train)
+print bagged.score(x_train, y_train)
+print rfc.score(x_train, y_train)
 # score the classfier on the test set 
-# print "Scoring..."
+print "Scoring..."
 print bdt.score(x_test, y_test)
 print bagged.score(x_test, y_test)
+print rfc.score(x_test, y_test)
 
 print "Writing predictions..."
-predictions = bagged.predict(test_data)
+predictions1 = bdt.predict(test_data)
+predictions2 = bagged.predict(test_data)
+predictions3 = rfc.predict(test_data)
+predictions = []
+for i in range(1355):
+	if predictions1[i] + predictions2[i] + predictions3[i] > 1:
+		predictions.append(1)
+	else:
+		predictions.append(0)
+
 f = open('predictions.csv', 'w')
 f.write('Id,Prediction\n')
 for i in range(1355):

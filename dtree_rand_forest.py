@@ -28,10 +28,10 @@ print "Loading test data..."
 test_data = np.loadtxt('testing_data.txt', delimiter='|', skiprows=1)
 
 # initialize a random forest classifier 
-rfc = RandomForestClassifier(n_estimators=100,
-							 max_depth=None,
-							 min_samples_split=2,
-							 min_samples_leaf=1)
+rfc = RandomForestClassifier(n_estimators=200,
+				 max_features=40,
+				 min_samples_split=2,
+				 min_samples_leaf=1)
 
 # specify parameters and distributions to sample from
 '''
