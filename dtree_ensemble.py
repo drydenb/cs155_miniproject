@@ -14,10 +14,10 @@ from sklearn import cross_validation
 from scipy.stats import randint as sp_randint
 
 # comment/uncomment to load original training data
-print "Loading training data..."
-raw_data = np.loadtxt('training_data.txt', delimiter='|', skiprows=1)
-x = raw_data[:, :1000];
-y = raw_data[:, 1000];
+# print "Loading training data..."
+# raw_data = np.loadtxt('training_data.txt', delimiter='|', skiprows=1)
+# x = raw_data[:, :1000];
+# y = raw_data[:, 1000];
 
 # partition the data into training and testing sets 
 # (this is not done before submission as we train on the whole dataset)
@@ -26,23 +26,24 @@ y = raw_data[:, 1000];
 # x_train, x_test, y_train, y_test = cross_validation.train_test_split(
 # 	x, y, test_size=test_size_percentage, random_state=seed)
 
-# for submission purposes only
-x_train = x
-y_train = y 
-
 print "Loading test data..."
-test_data = np.loadtxt('testing_data.txt', delimiter='|', skiprows=1)
+# test_data = np.loadtxt('testing_data.txt', delimiter='|', skiprows=1)
+test_data = np.loadtxt('tf_idf_test.txt', delimiter='|', skiprows=1)
 
 # comment/uncomment to load tf_idf weighted data (normalized with tf_idf)
-# print "Loading tf-idf weighted data..."
-# raw_data = np.loadtxt('training_data.txt', delimiter='|', skiprows=1)
-# x = np.loadtxt('tf_idf.txt', delimiter='|', skiprows=1)
-# y = raw_data[:, 1000];
+print "Loading tf-idf weighted data..."
+raw_data = np.loadtxt('training_data.txt', delimiter='|', skiprows=1)
+x = np.loadtxt('tf_idf.txt', delimiter='|', skiprows=1)
+y = raw_data[:, 1000];
 # # partition the data into training and testing sets
 # test_size_percentage = 0.25    # size of test set as a percentage in [0., 1.]
 # seed = 0                       # pseudo-random seed for split 
 # x_train, x_test, y_train, y_test = cross_validation.train_test_split(
 # 	x, y, test_size=test_size_percentage, random_state=seed)
+
+# for submission purposes only
+x_train = x
+y_train = y 
 
 # initialize the adaboost classifier (defaults to using shallow decision trees
 # as the weak learner to boost) and optimize parameters using random search

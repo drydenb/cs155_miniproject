@@ -19,6 +19,16 @@ np.savetxt('tf_idf.txt',
 	       delimiter='|', 
 	       header="tf-idf weighting of 'training_data.txt'")
 
+
+print "Loading test data..."
+test_data = np.loadtxt('testing_data.txt', delimiter='|', skiprows=1)
+transformer2 = TfidfTransformer()
+tfidf2 = transformer2.fit_transform(test_data)
+np.savetxt('tf_idf_test.txt', 
+	       tfidf2.toarray(), 
+	       delimiter='|', 
+	       header="tf-idf weighting of 'testing_data.txt'")
+
 # TfidfTransformer(norm=...'l2', smooth_idf=True, sublinear_tf=False,
 #                  use_idf=True)
 
