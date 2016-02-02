@@ -21,14 +21,14 @@ y = raw_data[:, 1000];
 
 # partition the data into training and testing sets 
 # (this is not done before submission as we train on the whole dataset)
-test_size_percentage = 0.20            # size of test set as a percentage in [0., 1.]
-seed = random.randint(0, 2**30)        # pseudo-random seed for split 
-x_train, x_test, y_train, y_test = cross_validation.train_test_split(
-	x, y, test_size=test_size_percentage, random_state=seed)
+# test_size_percentage = 0.20            # size of test set as a percentage in [0., 1.]
+# seed = random.randint(0, 2**30)        # pseudo-random seed for split 
+# x_train, x_test, y_train, y_test = cross_validation.train_test_split(
+# 	x, y, test_size=test_size_percentage, random_state=seed)
 
 # for submission purposes only
-# x_train = x
-# y_train = y 
+x_train = x
+y_train = y 
 
 print "Loading test data..."
 test_data = np.loadtxt('testing_data.txt', delimiter='|', skiprows=1)
@@ -47,7 +47,7 @@ test_data = np.loadtxt('testing_data.txt', delimiter='|', skiprows=1)
 # initialize the adaboost classifier (defaults to using shallow decision trees
 # as the weak learner to boost) and optimize parameters using random search
 print "Training adaboost DT..."
-bdt = AdaBoostClassifier(DecisionTreeClassifier(max_depth=1), n_estimators=400)
+bdt = AdaBoostClassifier(DecisionTreeClassifier(max_depth=1), n_estimators=600)
 bdt.fit(x_train, y_train)
 
 print "Training bagged DT..."
@@ -60,28 +60,28 @@ print "Training bagged DT..."
 #                                    n_iter=n_iter_search)
 
 # Set up bagging around each AdaBoost set
-bagged = BaggingClassifier(n_estimators=201, max_samples=0.1)
+bagged = BaggingClassifier(n_estimators=501, max_samples=0.05)
 bagged.fit(x_train, y_train)
 
 
 # initialize a random forest classifier 
 print 'Training random forest...'
-rfc = RandomForestClassifier(n_estimators=200,
-							 max_features=40,
+rfc = RandomForestClassifier(n_estimators=400,
+							 max_features=31,
 							 min_samples_split=2,
 							 min_samples_leaf=1)
 rfc.fit(x_train, y_train)
 
 
-print "Training scores..."
-print bdt.score(x_train, y_train)
-print bagged.score(x_train, y_train)
-print rfc.score(x_train, y_train)
-# score the classfier on the test set 
-print "Scoring..."
-print bdt.score(x_test, y_test)
-print bagged.score(x_test, y_test)
-print rfc.score(x_test, y_test)
+# print "Training scores..."
+# print bdt.score(x_train, y_train)
+# print bagged.score(x_train, y_train)
+# print rfc.score(x_train, y_train)
+# # score the classfier on the test set 
+# print "Scoring..."
+# print bdt.score(x_test, y_test)
+# print bagged.score(x_test, y_test)
+# print rfc.score(x_test, y_test)
 
 print "Writing predictions..."
 predictions1 = bdt.predict(test_data)
