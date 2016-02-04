@@ -55,20 +55,20 @@ y_train = y
 # initialize the adaboost classifier (defaults to using shallow decision trees
 # as the weak learner to boost) and optimize parameters using random search
 print "Training adaboost DT..."
-bdt = AdaBoostClassifier(DecisionTreeClassifier(max_depth=1), n_estimators=600)
+bdt = AdaBoostClassifier(DecisionTreeClassifier(max_depth=1), n_estimators=800)
 bdt.fit(x_train, y_train)
 
 # Set up a bagged decision tree learner
 print "Training bagged DT..."
-bagged = BaggingClassifier(n_estimators=501, max_samples=0.05)
+bagged = BaggingClassifier(n_estimators=501, max_samples=0.1)
 bagged.fit(x_train, y_train)
 
 
 # initialize a random forest classifier 
 print 'Training random forest...'
-rfc = RandomForestClassifier(n_estimators=400,
+rfc = RandomForestClassifier(n_estimators=600,
 							 max_features=31,
-							 min_samples_split=2,
+							 min_samples_split=1,
 							 min_samples_leaf=1)
 rfc.fit(x_train, y_train)
 
