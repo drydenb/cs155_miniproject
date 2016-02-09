@@ -1,11 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import random
+import xgboost as xgb
 
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.ensemble import BaggingClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.linear_model import SGDClassifier
 from sklearn import cross_validation
 from scipy.stats import randint as sp_randint
 
@@ -40,7 +42,7 @@ test_data = np.loadtxt('tf_idf_test.txt', delimiter='|', skiprows=1)
 # test_size_percentage = 0.20            # size of test set as a percentage in [0., 1.]
 # seed = random.randint(0, 2**30)        # pseudo-random seed for split 
 # x_train, x_test, y_train, y_test = cross_validation.train_test_split(
-# 	x, y, test_size=test_size_percentage, random_state=seed)
+#     x, y, test_size=test_size_percentage, random_state=seed)
 
 # for submission purposes only
 x_train = x
@@ -67,40 +69,60 @@ bagged.fit(x_train, y_train)
 # initialize a random forest classifier 
 print 'Training random forest...'
 rfc = RandomForestClassifier(n_estimators=600,
-							 max_features=31,
-							 min_samples_split=1,
-							 min_samples_leaf=1)
+                             max_features=31,
+                             min_samples_split=1,
+                             min_samples_leaf=1)
 rfc.fit(x_train, y_train)
 
 
-# Print scores when cross-validating
+print 'Training XGBoost...'
+dtrain = xgb.DMatrix(x_train, label=y_train)
+dtest = xgb.DMatrix(test_data)
+# dtest = xgb.DMatrix(x_test, label=y_test)
+param = {'objective':'binary:logistic', 'silent':1 }
+num_round = 50
+bst = xgb.train( param, dtrain, num_round )
+xgbpreds = bst.predict(dtest)
+# labels = dtest.get_label()
+
+print 'Training SGD Classifier..'
+clf = SGDClassifier(n_iter=100, loss='hinge', alpha=.0003)
+clf.fit(x_train, y_train)
+
+# # Print scores when cross-validating
 # print "Training scores..."
 # print bdt.score(x_train, y_train)
 # print bagged.score(x_train, y_train)
 # print rfc.score(x_train, y_train)
+# print 'no'
+# print clf.score(x_train, y_train)
 # # score the classfier on the test set 
 # print "Scoring..."
 # print bdt.score(x_test, y_test)
 # print bagged.score(x_test, y_test)
 # print rfc.score(x_test, y_test)
+# print (1.0 - sum(1 for i in range(len(xgbpreds)) if int(xgbpreds[i]>0.5)!=labels[i]) /float(len(xgbpreds)))
+# print clf.score(x_test, y_test)
 
-
-print 'Combining models and making predictions...'
+# print 'Combining models and making predictions...'
 predictions1 = bdt.predict(test_data)
 predictions2 = bagged.predict(test_data)
 predictions3 = rfc.predict(test_data)
+predictions4 = [1 if i > 0.5 else 0 for i in xgbpreds]
+predictions5 = clf.predict(test_data)
 predictions = []
 for i in range(1355):
-	if predictions1[i] + predictions2[i] + predictions3[i] > 1:
-		predictions.append(1)
-	else:
-		predictions.append(0)
+  if predictions1[i] + predictions2[i] + predictions3[i] + \
+        predictions4[i] + predictions5[i] > 2:
+      predictions.append(1)
+  else:
+      predictions.append(0)
 
 print "Writing predictions..."
 f = open('predictions.csv', 'w')
 f.write('Id,Prediction\n')
 for i in range(1355):
-	f.write(str(i+1) + ',' + str(int(predictions[i])) + '\n')
+  f.write(str(i+1) + ',' + str(int(predictions[i])) + '\n')
 
 
 
@@ -137,11 +159,11 @@ for i in range(1355):
 # validation_std_devs = []
 # print estimators 
 # for n in estimators:
-# 	print "Training with n_estimators = " + str(n)
-# 	bdt = AdaBoostClassifier(DecisionTreeClassifier(max_depth=2),
-# 	                         n_estimators=n,
+#   print "Training with n_estimators = " + str(n)
+#   bdt = AdaBoostClassifier(DecisionTreeClassifier(max_depth=2),
+#                            n_estimators=n,
 #                              learning_rate=1.)
-# 	print "Computing validation mean..."
-# 	scores = cross_validation.cross_val_score(bdt, x_train, y_train, cv=5)
-# 	validation_means.append(scores.mean())
-# 	validation_std_devs.append(scores.std() * 2)
+#   print "Computing validation mean..."
+#   scores = cross_validation.cross_val_score(bdt, x_train, y_train, cv=5)
+#   validation_means.append(scores.mean())
+#   validation_std_devs.append(scores.std() * 2)
