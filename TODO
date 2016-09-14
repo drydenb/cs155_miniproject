@@ -1,2 +1,3 @@
 TODO:
 	Refactor dtree_ensemble.py
+	Make conversion in tf_idf.py conform to expected train/test dimensions
