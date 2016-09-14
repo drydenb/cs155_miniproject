@@ -5,7 +5,6 @@ import random
 import numpy as np
 
 from sklearn.linear_model import SGDClassifier
-from sklearn import cross_validation
 
 ################################################################################
 # FUNCTION DEFINITIONS
