@@ -1,12 +1,17 @@
-This is the Kaggle Miniproject for CS 155 at Caltech on
-Sentiment Analysis.
+This is a Kaggle Miniproject for CS 155 at Caltech on Sentiment Analysis.
 
-The team is:
-	Jeffery An
-	Rohan Batra
-	Dryden Bouamalay
+    Original contributors to the project were: Jeffery An, Rohan Batra, and 
+    Dryden Bouamalay.
 
-If you are participating in the competition it is a 
-violation of the honor code to look at the code in this 
-repository without permission from one of the team members
-above. 
+    The code has since been refactored and the directory tree has been 
+    restructured by Dryden Bouamalay. 
+
+    Project structure: 
+        data/           Contains preprocessing scripts and data files to run the 
+                        analysis.
+        docs/           Contains a PDF summarizing the results of the project.
+        models/         Contains Python scripts which can be run on data files 
+                        in data/ to generate .csv files to predictions/.
+        predictions/    Contains .csv files that comprise model predictions. 
+
+
