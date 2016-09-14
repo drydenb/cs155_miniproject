@@ -1,74 +1,128 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn import tree
+import os 
+import sys
 import random
+import getopt
+import numpy as np
 
-raw_data = np.loadtxt('training_data.txt', delimiter='|', skiprows=1)
-x_train = raw_data[:, :1000];
-y_train = raw_data[:, 1000];
+from sklearn import tree
 
-'''
-x_train = raw_data[:3000, :1000]
-y_train = raw_data[:3000, 1000]
-x_test = raw_data[3000:, :1000]
-y_test = raw_data[3000:, 1000]
+################################################################################
+# FUNCTION DEFINITIONS
+################################################################################
 
-training_errors = []
-test_errors = []
-for i in range(1, 26):
-	clf = tree.DecisionTreeClassifier(min_samples_leaf=i)
-	clf = clf.fit(x_train, y_train)
+def usage(argv):
 
-	training_errors.append(1 - clf.score(x_train, y_train))
-	test_errors.append(1 - clf.score(x_test, y_test))
+    """
+    Prints the usage statement for the script. 
+    """
 
-# Plot the errors
-plt.figure(1)
-plota1, = plt.plot(range(1, 26), training_errors, label='Training Error')
-plota2, = plt.plot(range(1, 26), test_errors, label='Test Error')
-plt.title('Error vs. min leaf node size for decision trees')
-plt.xlabel('Minimum Leaf Node Size')
-plt.ylabel('Error')
-plt.legend(handles=[plota1, plota2], loc=1)
-plt.show()
-'''
+    print "usage: ", argv[0], " -t <train_file> -v <test_file>"
+    print """
+          Options:
+          -t [ --train ]    The file containing the training data.
+          -v [ --test ]     The file containing the test data. 
+          """
+    return 
 
-# Set up variables
-samples = 101
-sample_size = 400
-clfs = []
+def main(argv):
 
-# Train some trees
-print 'Training trees...'
-for i in range(samples):
-	x_sub = []
-	y_sub = []
-	for j in range(sample_size):
-		index = random.randint(0, 4189-1)
-		x_sub.append(x_train[index])
-		y_sub.append(y_train[index])
+    """
+    The main function of the script. Executed when __name__ == '__main__'. 
+    """
 
-	# Data to run our test model on
-	clf = tree.DecisionTreeClassifier()
-	clf = clf.fit(x_sub, y_sub)
-	clfs.append(clf)
+    ########################################
+    # Parse command line arguments...
+    ########################################
 
-# Create predictions and aggregate
-print 'Aggregating predictions...'
-test_data = np.loadtxt('testing_data.txt', delimiter='|', skiprows=1)
-agg_predictions = clfs[0].predict(test_data)
-for i in range(1, samples):
-	agg_predictions += clfs[i].predict(test_data)
+    short_args = "ht:v:"
+    long_args = ["help", "train=", "test="]
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], short_args, long_args)
+    except getopt.GetoptError as err:
+        print str(err)    # print the err to stdout
+        usage(argv)       # print the usage statement
+        sys.exit(1)
 
-predictions = []
-for i in range(1355):
-	if agg_predictions[i] > (samples / 2):
-		predictions.append(1)
-	else:
-		predictions.append(0)
+    train_file = None
+    test_file = None
+    for o, a in opts:
+        if o in ("-h", "--help"):
+            usage(argv)
+            sys.exit()
+        elif o in ("-t", "--train"):
+            train_file = a 
+        elif o in ("-v", "--test"):
+            test_file = a 
+        else:
+            usage(argv)
+            sys.exit(1)
 
-# Write predictions to file
-f = open('predictions.csv', 'w')
-f.write('Id,Prediction\n')
-for i in range(1355):
-	f.write(str(i+1) + ',' + str(int(predictions[i])) + '\n')
+    if train_file is None or test_file is None:
+        usage(argv)
+        sys.exit(1)
+
+    ########################################
+    # Run the model...
+    ########################################
+
+    print "Loading training data..."
+    train_data = np.loadtxt(train_file, delimiter='|', skiprows=1)
+    x_train = train_data[:, :1000]
+    y_train = train_data[:, 1000]
+
+    # Set up variables
+    samples = 101
+    sample_size = 400
+    clfs = []
+
+    # Train some trees
+    print 'Training trees...'
+    for i in range(samples):
+        x_sub = []
+        y_sub = []
+        for j in range(sample_size):
+            index = random.randint(0, 4189-1)
+            x_sub.append(x_train[index])
+            y_sub.append(y_train[index])
+
+        # Data to run our test model on
+        clf = tree.DecisionTreeClassifier()
+        clf = clf.fit(x_sub, y_sub)
+        clfs.append(clf)
+
+    # Create predictions and aggregate
+    print 'Aggregating predictions...'
+    test_data = np.loadtxt(test_file, delimiter='|', skiprows=1)
+    agg_predictions = clfs[0].predict(test_data)
+    for i in range(1, samples):
+        agg_predictions += clfs[i].predict(test_data)
+
+    predictions = []
+    for i in range(1355):
+        if agg_predictions[i] > (samples / 2):
+            predictions.append(1)
+        else:
+            predictions.append(0)
+
+    # Write predictions to file
+    print "Writing predictions..."
+    predictions_dir = '../../predictions/'
+    predictions_filename = (str(os.path.splitext(argv[0])[0]) + 
+                            '_predictions.csv')
+    predictions_filename = os.path.join(predictions_dir, predictions_filename)
+    with open(predictions_filename, 'w') as f:
+        f.write('Id,Prediction\n')
+        for i in range(1355):
+            f.write(str(i+1) + ',' + str(int(predictions[i])) + '\n')
+    
+    sys.exit()
+
+################################################################################
+# MAIN
+################################################################################
+
+if __name__ == '__main__':
+    main(sys.argv)
+
+
+
