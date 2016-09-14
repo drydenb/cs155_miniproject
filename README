@@ -1,10 +1,10 @@
-This is a Kaggle Miniproject for CS 155 at Caltech on Sentiment Analysis.
+This is a Kaggle project for CS 155 at Caltech on Sentiment Analysis.
+
+    The code has been refactored and the directory tree has been restructured by
+    Dryden Bouamalay. 
 
     Original contributors to the project were: Jeffery An, Rohan Batra, and 
     Dryden Bouamalay.
-
-    The code has since been refactored and the directory tree has been 
-    restructured by Dryden Bouamalay. 
 
     Project structure: 
         data/           Contains preprocessing scripts and data files to run the 
