@@ -1,47 +1,101 @@
-import numpy as np
+import os
+import sys
+import getopt
 import random
+import numpy as np
+
 from sklearn.linear_model import SGDClassifier
 from sklearn import cross_validation
 
-VALIDATION = 1
+################################################################################
+# FUNCTION DEFINITIONS
+################################################################################
 
-print "Loading tf-idf weighted data..."
-raw_data = np.loadtxt('training_data.txt', delimiter='|', skiprows=1)
-x = np.loadtxt('tf_idf.txt', delimiter='|', skiprows=1)
-y = raw_data[:, 1000];
+def usage(argv):
 
+    """
+    Prints the usage statement for the script. 
+    """
 
-print "Loading test data..."
-test_data = np.loadtxt('tf_idf_test.txt', delimiter='|', skiprows=1)
+    print "usage: ", argv[0], " -t <train_file> -v <test_file>"
+    print """
+          Options:
+          -t [ --train ]    The file containing the training data.
+          -v [ --test ]     The file containing the test data. 
+          """
+    return 
 
+def main(argv):
 
+    """
+    The main function of the script. Executed when __name__ == '__main__'. 
+    """
 
-# Cross validation:
-# partition the data into training and testing sets 
-# (this is not done before submission as we train on the whole dataset)
+    ########################################
+    # Parse command line arguments...
+    ########################################
 
-if (VALIDATION):
-    test_size_percentage = 0.20            # size of test set as a percentage in [0., 1.]
-    seed = random.randint(0, 2**30)        # pseudo-random seed for split 
-    x_train, x_test, y_train, y_test = cross_validation.train_test_split(
-        x, y, test_size=test_size_percentage, random_state=seed)
-else:
-    x_train = x
-    y_train = y
+    short_args = "ht:v:"
+    long_args = ["help", "train=", "test="]
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], short_args, long_args)
+    except getopt.GetoptError as err:
+        print str(err)    # print the err to stdout
+        usage(argv)       # print the usage statement
+        sys.exit(1)
 
-clf = SGDClassifier(n_iter=100, loss='hinge', alpha=.0003)
-clf.fit(x_train, y_train)
+    train_file = None
+    test_file = None
+    for o, a in opts:
+        if o in ("-h", "--help"):
+            usage(argv)
+            sys.exit()
+        elif o in ("-t", "--train"):
+            train_file = a 
+        elif o in ("-v", "--test"):
+            test_file = a 
+        else:
+            usage(argv)
+            sys.exit(1)
 
-if (VALIDATION):
-    print "Training score..."
-    print clf.score(x_train, y_train)
-    print "Scoring..."
-    score = clf.score(x_test, y_test)
-    print score
-else:
+    if train_file is None or test_file is None:
+        usage(argv)
+        sys.exit(1)
+
+    ########################################
+    # Run the model...
+    ########################################
+
+    print "Loading training data..."
+    train_data = np.loadtxt(train_file, delimiter='|', skiprows=1)
+    x_train = train_data[:, :1000]
+    y_train = train_data[:, 1000];
+
+    print "Loading test data..."
+    test_data = np.loadtxt(test_file, delimiter='|', skiprows=1)
+
+    print "Training SGD classifier..."
+    clf = SGDClassifier(n_iter=100, loss='hinge', alpha=.0003)
+    clf.fit(x_train, y_train)
+
     print "Writing predictions..."
     predictions = clf.predict(test_data)
-    f = open('predictions.csv', 'w')
-    f.write('Id,Prediction\n')
-    for i in range(1355):
-        f.write(str(i+1) + ',' + str(int(predictions[i])) + '\n')
+    predictions_dir = '../../predictions/'
+    predictions_filename = (str(os.path.splitext(argv[0])[0]) + 
+                            '_predictions.csv')
+    predictions_filename = os.path.join(predictions_dir, predictions_filename)
+    with open(predictions_filename, 'w') as f:
+        f.write('Id,Prediction\n')
+        num_samples = 1355
+        for i in range(num_samples):
+            f.write(str(i+1) + ',' + str(int(predictions[i])) + '\n')
+
+    sys.exit()
+
+################################################################################
+# MAIN
+################################################################################
+
+if __name__ == '__main__':
+    main(sys.argv)
+
