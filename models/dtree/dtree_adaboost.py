@@ -75,8 +75,6 @@ def main(argv):
 
     print "Loading test data..."
     test_data = np.loadtxt(test_file, delimiter='|', skiprows=1)
-    x_test = train_data[:, :1000]
-    y_test = train_data[:, 1000]
 
     # initialize the adaboost classifier (defaults to using shallow decision 
     # trees as the weak learner to boost), optimize params w/ random search
@@ -88,14 +86,10 @@ def main(argv):
     # parameters on the level of random search)
     print "Training BDT and optimizing parameter space with random search..."
     param_dist = {"n_estimators": sp_randint(200,600)}
-    n_iter_search = 2    # 20 is the number choosen in the example in sklearn
+    n_iter_search = 2    
     random_search = RandomizedSearchCV(bdt, param_distributions=param_dist,
                                        n_iter=n_iter_search)
     random_search.fit(x_train, y_train)
-
-    # score the classfier on the test set 
-    print "Scoring..."
-    print random_search.score(x_test, y_test)
 
     # record the predictions to a file 
     print "Writing predictions..."
@@ -106,7 +100,8 @@ def main(argv):
     predictions_filename = os.path.join(predictions_dir, predictions_filename)
     with open(predictions_filename, 'w') as f:
         f.write('Id,Prediction\n')
-        for i in range(1355):
+        num_samples = 1355 
+        for i in range(num_samples):
             f.write(str(i+1) + ',' + str(int(predictions[i])) + '\n')
 
     sys.exit()

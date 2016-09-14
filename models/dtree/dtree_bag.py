@@ -112,7 +112,8 @@ def main(argv):
     predictions_filename = os.path.join(predictions_dir, predictions_filename)
     with open(predictions_filename, 'w') as f:
         f.write('Id,Prediction\n')
-        for i in range(1355):
+        num_samples = 1355 
+        for i in range(num_samples):
             f.write(str(i+1) + ',' + str(int(predictions[i])) + '\n')
     
     sys.exit()
