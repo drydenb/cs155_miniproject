@@ -2,6 +2,7 @@ import os
 import sys
 import getopt
 import numpy as np
+import scipy as sp 
 
 from sklearn.feature_extraction.text import TfidfTransformer
 
@@ -73,7 +74,12 @@ def main(argv):
     # using the transformer, normalize x using tf-idf weighting 
     print "Normalizing training data with tf-idf weighting..."
     transformer = TfidfTransformer()
-    tfidf_train = transformer.fit_transform(x)
+    tfidf_train = transformer.fit_transform(x).toarray()
+    # add the target y column to create training data with proper dimensions
+    tmp = np.zeros((tfidf_train.shape[0], tfidf_train.shape[1] + 1))
+    tmp[:,:-1] = tfidf_train
+    tmp[:,-1] = y 
+    tfidf_train = tmp
 
     # print out the normalized data to file 
     print "Writing converted training data to file..."
@@ -82,7 +88,7 @@ def main(argv):
     train_file_prefix = os.path.splitext(train_file_base)[0]
     tfidf_train_filename = os.path.join(data_dir, train_file_prefix + '_tf_idf.txt')
     np.savetxt(tfidf_train_filename, 
-               tfidf_train.toarray(), 
+               tfidf_train, 
                delimiter='|', 
                header=("tf-idf weighting of " + train_file_base))
 

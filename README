@@ -15,9 +15,9 @@ Classification.
 
     Project structure: 
         data/           Contains preprocessing scripts and data files to run the 
-                        analysis. "training_data.txt" contains 4189 speeches 
-                        used train our models, while "testing_data.txt" contains 
-                        1355 test points used for generating predictions. 
+                        analysis. Under raw/, "training_data.txt" contains 4189 
+                        speeches used train our models, while "testing_data.txt" 
+                        contains 1355 test points used for making predictions. 
         docs/           Contains a PDF summarizing the results of the project.
         models/         Contains Python scripts which can be run on data files 
                         in data/ to generate .csv files to predictions/.
