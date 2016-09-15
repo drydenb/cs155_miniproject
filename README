@@ -7,8 +7,8 @@ Classification.
     given some sample. The results of the project as well are summarized in a 
     report under docs/.
 
-    The code has been recently been refactored and the directory tree has been 
-    restructured by Dryden Bouamalay. 
+    The code has been refactored and the directory tree has been restructured 
+    by Dryden Bouamalay. 
 
     Original contributors to the project were: Jeffery An, Rohan Batra, and 
     Dryden Bouamalay.
