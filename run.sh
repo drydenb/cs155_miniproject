@@ -8,8 +8,6 @@ PROJECT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # run each of the models in turn:
 echo "Now running all models..."
-
-set +x
 python $PROJECT_DIR/models/dtree/dtree_adaboost.py \
        -t $PROJECT_DIR/data/raw/training_data.txt \
        -v $PROJECT_DIR/data/raw/testing_data.txt
@@ -29,6 +27,9 @@ python $PROJECT_DIR/models/dtree/dtree_rand_forest.py \
 python $PROJECT_DIR/models/sgd/sgd_classifier.py \
        -t $PROJECT_DIR/data/raw/training_data.txt \
        -v $PROJECT_DIR/data/raw/testing_data.txt
-set -x
+
+# move predictions to the predictions folder
+mv $PROJECT_DIR/models/dtree/*.csv $PROJECT_DIR/predictions
+mv $PROJECT_DIR/models/sgd/*.csv $PROJECT_DIR/predictions
 
 echo "Finished."
