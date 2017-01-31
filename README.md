@@ -19,7 +19,13 @@ Project structure:
 * `data/` Contains preprocessing scripts and data files to run the analysis. Under `raw/`, `training_data.txt` contains 4189 speeches used train our models, while `testing_data.txt` contains 1355 test points used for making predictions. 
 * `docs/` Contains a PDF summarizing the results of the project.
 * `models/` Contains Python scripts which can be run on data files in `data/` to generate .csv files to `predictions/`.
-* `predictions/` Contains `.csv` files that comprise model predictions. 
+* `predictions/` Contains `.csv` files that comprise model predictions.
+
+## Installation
+
+First install `virtualenvwrapper` for your distribution. Then make a virtual environment in which to run the scripts and install all dependencies with `pip`:
+
+	pip install -r requirements.txt
 
 ## Run
 
@@ -27,6 +33,8 @@ To test out a model, run Python on the corresponding script in `models/` with
 training and test data as arguments, i.e.: 
 
 `python dtree_adaboost.py -t ../../data/raw/training_data.txt -v ../../data/raw/testing_data.txt`
+
+Alternatively, run all the models sequentially using the Bash script provided: `run.sh`.
 
 The predictions made by the model will be put in `predictions/`.
 
