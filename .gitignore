@@ -1,3 +1,6 @@
+# Ignore predictions
+*.csv
+
 # Mac
 
 
