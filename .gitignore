@@ -1,9 +1,10 @@
 # Ignore predictions
 *.csv
 
+# PyCharm
+.idea/*
+
 # Mac
-
-
 *.DS_Store
 .AppleDouble
 .LSOverride
